@@ -1,4 +1,4 @@
-function [lgraph, anchors, classes, mask] = importDarknetNetwork(weightsfile, cfgfile)
+function [lgraph, anchors, classes, mask] = importDarknetNetwork(weightsfile, cfgfile, out, fold)
 
 %% ダウンロードしたファイルのオープン
 fid = fopen(weightsfile, 'rb');
@@ -84,7 +84,11 @@ for i = 1:size(layerIdx,1)
         disp(txt)
     elseif strcmp(layerName, '[convolutional]')
         % Convolutional層(conv2d, batchNorm, ReLu)の作成
-        [lgraph, readSize] = createConv2d(lgraph, layerInfo, fid, i);
+        % modified by Yikai Mao to output weights/bias
+        % modified by Yikai Mao to accommodate for BN folding
+        load('weights_folded.mat', 'weights_folded');
+        load('bias_folded.mat', 'bias_folded');
+        [lgraph, readSize] = createConv2d(lgraph, layerInfo, fid, i, out, fold, weights_folded, bias_folded);
         
     elseif strcmp(layerName, '[maxpool]')
         % Max Pooling層の作成
@@ -105,7 +109,8 @@ for i = 1:size(layerIdx,1)
     elseif strcmp(layerName, '[route]')
         % Route層の作成(分岐か結合(depthConcat))
         % 分岐の場合はrouteInfo必要
-        lgraph = createRoute(lgraph, layerInfo, i);
+        % modified by Yikai Mao to accommodate for BN folding
+        lgraph = createRoute(lgraph, layerInfo, i, fold);
 
     elseif strcmp(layerName, '[reorg]')
         % Reorganization層の作成

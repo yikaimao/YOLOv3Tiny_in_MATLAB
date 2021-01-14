@@ -1,4 +1,4 @@
-function lgraph = createRoute(lgraph, layerInfo, creationIdx)
+function lgraph = createRoute(lgraph, layerInfo, creationIdx, fold)
 
     global layersList
     global numlayers
@@ -45,7 +45,11 @@ function lgraph = createRoute(lgraph, layerInfo, creationIdx)
                 % 畳み込み層がBatch NormalizationとReluでフォローされる場合、
                 % 結合元ソースはReluとする
                 idx = find(strcmp(layersList.All, concat_source));
-                if ischar(layersList.All{idx+2}) && startsWith(layersList.All{idx+2}, 'leaky_relu')
+                % modified by Yikai Mao to accommodate for BN folding
+                if fold && ischar(layersList.All{idx+1}) && startsWith(layersList.All{idx+1}, 'leaky_relu')
+                    idx = idx+1;
+                    concat_source = layersList.All{idx};
+                elseif ~fold && ischar(layersList.All{idx+2}) && startsWith(layersList.All{idx+2}, 'leaky_relu')
                     idx = idx+2;
                     concat_source = layersList.All{idx};
                 end

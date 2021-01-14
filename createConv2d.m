@@ -1,4 +1,4 @@
-function [lgraph, readSizeOut] = createConv2d(lgraph, layerInfo, fid, creationIdx)
+function [lgraph, readSizeOut] = createConv2d(lgraph, layerInfo, fid, creationIdx, out, fold, weights_folded, bias_folded)
 
     global layersList
     global numlayers
@@ -90,10 +90,24 @@ function [lgraph, readSizeOut] = createConv2d(lgraph, layerInfo, fid, creationId
     %Batch Normalization有りの場合の層定義&追加
     if bn
         %畳み込み層の定義&追加
+        % modified by Yikai Mao to output weights/bias
+        % modified by Yikai Mao to accommodate for BN folding
         lname = ['conv2d_', num2str(numconv)];
         layer_conv = convolution2dLayer(sz, filters, 'Stride', stride, 'Padding', padding, 'Name', lname);
-        layer_conv.Weights = conv_weights;
-        layer_conv.Bias = zeros(1,1,filters,'single');
+        if fold
+            layer_conv.Weights = weights_folded{numconv};
+            layer_conv.Bias = bias_folded{numconv};
+        else
+            layer_conv.Weights = conv_weights;
+            layer_conv.Bias = zeros(1,1,filters,'single');
+            if out
+                %writematrix(layer_conv.Weights, strcat(lname,'_weights'));
+                %writematrix(layer_conv.Bias, strcat(lname,'_bias'));
+                save(strcat(lname,'_weights'), 'conv_weights');
+                temp = layer_conv.Bias;
+                save(strcat(lname,'_bias'), 'temp');
+            end
+        end
         layers = [layers; layer_conv];
         lnames = [lnames; {lname, filters}];
         numlayers(creationIdx) = numlayers(creationIdx) + 1;
@@ -102,27 +116,56 @@ function [lgraph, readSizeOut] = createConv2d(lgraph, layerInfo, fid, creationId
             'Filtersize - ',num2str(filters),' : Stride - ',num2str(stride), ' : Read param# - ', num2str(rwsize)];
         disp(txt)                   
         %BatchNormalization層の定義&追加
+        % modified by Yikai Mao to output weights/bias
+        % modified by Yikai Mao to accommodate for BN folding
         lname = ['batch_norm_', num2str(numconv)];
         layer_bn = batchNormalizationLayer('Name', lname);
-        layer_bn.Offset = conv_bias;
-        layer_bn.Scale = bn_scale;
-        layer_bn.TrainedMean = bn_mean;
-        layer_bn.TrainedVariance = bn_var;               
-
-        layer_bn.Epsilon = 1e-3;
-        layers = [layers; layer_bn];
-        lnames = [lnames; {lname, filters}];
-        numlayers(creationIdx) = numlayers(creationIdx) + 1;
-        %表示
-        txt = ['Batch norm layer ', num2str(numconv), ' : Read param# - ', num2str(rbsize+rbnsize)];
-        disp(txt)
-    %Batch Normalization無しの場合の層定義&追加    
+        if fold
+            txt = ['Skipping batch norm ', num2str(numconv)];
+            disp(txt)
+        else
+            layer_bn.Offset = conv_bias;
+            layer_bn.Scale = bn_scale;
+            layer_bn.TrainedMean = bn_mean;
+            layer_bn.TrainedVariance = bn_var;
+            layer_bn.Epsilon = 1e-3;
+            if out
+                %writematrix(layer_bn.Offset, strcat(lname,'_offset'));
+                %writematrix(layer_bn.Scale, strcat(lname,'_scale'));
+                %writematrix(layer_bn.TrainedMean, strcat(lname,'_mean'));
+                %writematrix(layer_bn.TrainedVariance, strcat(lname,'_variance'));
+                save(strcat(lname,'_offset'), 'conv_bias');
+                save(strcat(lname,'_scale'), 'bn_scale');
+                save(strcat(lname,'_mean'), 'bn_mean');
+                save(strcat(lname,'_variance'), 'bn_var');
+            end
+            layers = [layers; layer_bn];
+            lnames = [lnames; {lname, filters}];
+            numlayers(creationIdx) = numlayers(creationIdx) + 1;
+            %表示
+            txt = ['Batch norm layer ', num2str(numconv), ' : Read param# - ', num2str(rbsize+rbnsize)];
+            disp(txt)
+        end
+    %Batch Normalization無しの場合の層定義&追加
     else
         %畳み込み層の定義&追加
+        % modified by Yikai Mao to output weights/bias
+        % modified by Yikai Mao to accommodate for BN folding
         lname = ['conv2d_', num2str(numconv)];
         layer_conv = convolution2dLayer(sz, filters, 'Stride', stride, 'Padding', padding, 'Name', lname);
-        layer_conv.Weights = conv_weights;
-        layer_conv.Bias = conv_bias;
+        if fold
+            layer_conv.Weights = weights_folded{numconv};
+            layer_conv.Bias = bias_folded{numconv};
+        else
+            layer_conv.Weights = conv_weights;
+            layer_conv.Bias = conv_bias;
+            if out
+                %writematrix(layer_conv.Weights, strcat(lname,'_weights'));
+                %writematrix(layer_conv.Bias, strcat(lname,'_bias'));
+                save(strcat(lname,'_weights'), 'conv_weights');
+                save(strcat(lname,'_bias'), 'conv_bias');
+            end
+        end
         layers = [layers; layer_conv];
         lnames = [lnames; {lname, filters}];
         numlayers(creationIdx) = numlayers(creationIdx) + 1;
