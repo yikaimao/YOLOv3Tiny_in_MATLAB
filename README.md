@@ -1,7 +1,14 @@
 # YOLOv3-tiny-in-MATLAB
 
 usage: yolov3Tiny_Mao_v2.mlx (OLD)
+
 usage: yolov3Tiny_Mao_v3.mlx (new with batch norm folding)
+
+  1. use out = 1; fold = 0; to output all the learnable parameters into .mat files
+  
+  2. use BN_fold_single.m to fold the batch norm parameters into conv weights and biases (weights_folded.mat/bias_folded.mat)
+  
+  3. change to out = 0; fold = 1;
 
 ## Required MATLAB Add-ons:
 
