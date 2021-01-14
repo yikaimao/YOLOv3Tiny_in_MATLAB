@@ -1,6 +1,7 @@
 # YOLOv3-tiny-in-MATLAB
 
-usage: yolov3Tiny_Mao_v2.mlx
+usage: yolov3Tiny_Mao_v2.mlx (OLD)
+usage: yolov3Tiny_Mao_v3.mlx (new with batch norm folding)
 
 ## Required MATLAB Add-ons:
 
