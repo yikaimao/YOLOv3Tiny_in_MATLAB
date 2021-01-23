@@ -18,6 +18,12 @@ usage: yolov3Tiny_Mao_v3.mlx (new with batch norm folding)
 
 [Image Processing Toolbox](https://www.mathworks.com/products/image.html?s_tid=FX_PR_info)
 
+If you don't have the toolboxes:
+
+[kc_YOLOv3-Tiny](https://github.com/yikaimao/kc_YOLOv3Tiny)
+
+(the final NMS step still uses the Computer Vision Toolbox, but the output variables should be generated in your workspace.)
+
 ## References:
 
 [YOLO: Real-Time Object Detection](https://pjreddie.com/darknet/yolo/)
