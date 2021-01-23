@@ -22,7 +22,7 @@ If you don't have the toolboxes:
 
 [kc_YOLOv3-Tiny](https://github.com/yikaimao/kc_YOLOv3Tiny)
 
-(the final NMS step still uses the Computer Vision Toolbox, but the output variables should be generated in your workspace.)
+(the final NMS step still uses the Computer Vision Toolbox, but you should have all the raw outputs generated in your workspace.)
 
 ## References:
 
