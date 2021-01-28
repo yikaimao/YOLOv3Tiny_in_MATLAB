@@ -1,3 +1,6 @@
+% Yikai Mao 1/12/2021
+% fold batch norm parameters into conv weights/biases
+
 weights_folded = cell(1,13);
 bias_folded = cell(1,13);
 
@@ -41,4 +44,7 @@ end
 % previous bias is always 0
 bias_folded = zeros(1,1,filters, 'single');
 bias_folded(1,1,:) = ((scale(1,1,1,:) .* (0 - mean(1,1,1,:)))./(sqrt(variance(1,1,1,:) + 1e-3))) + offset(1,1,1,:);
+
+save("weights_folded", 'weights_folded');
+save("bias_folded", 'bias_folded');
 end

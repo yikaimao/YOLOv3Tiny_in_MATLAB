@@ -86,9 +86,7 @@ for i = 1:size(layerIdx,1)
         % Convolutional層(conv2d, batchNorm, ReLu)の作成
         % modified by Yikai Mao to output weights/bias
         % modified by Yikai Mao to accommodate for BN folding
-        load('weights_folded.mat', 'weights_folded');
-        load('bias_folded.mat', 'bias_folded');
-        [lgraph, readSize] = createConv2d(lgraph, layerInfo, fid, i, out, fold, weights_folded, bias_folded);
+        [lgraph, readSize] = createConv2d(lgraph, layerInfo, fid, i, out, fold);
         
     elseif strcmp(layerName, '[maxpool]')
         % Max Pooling層の作成
